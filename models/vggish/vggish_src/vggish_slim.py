@@ -147,9 +147,12 @@ class VGGish(VGG):
 
                 self.pproc.load_state_dict(state_dict)
 
-    def forward(self, x, device=torch.device('cpu'), fs=None):
+    def forward(self, x, device=torch.device('cpu'), fs=None, id=None):
         if self.preprocess:
             x = self._preprocess(x, device, fs)
+            arr=x.cpu().view(-1,64).numpy()
+            np.save('tmp/spectrogram/'+id+'_spectrogram.npy',arr)
+
         x = VGG.forward(self, x)
         if self.postprocess:
             x = self._postprocess(x)
@@ -162,6 +165,8 @@ class VGGish(VGG):
             x = vggish_input.wavfile_to_examples(x)
         else:
             raise AttributeError
+
+
         x = x.to(device)
         return x
 
